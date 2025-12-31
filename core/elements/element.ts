@@ -59,15 +59,11 @@ export class Element {
         await this.getElement().click();
     }
 
-    async clickWithIndex(index: number = 0) {
-        const element = await this.getElement();
-        const resolved = await element.count();
-        if (resolved > 1) {
-            await element.nth(index).click();
-        } else {
-            await element.click();
-        }
+    async clickWithIndex(index: number = 0, options: any = {}) {
+        const element = this.getElement();
+        await element.nth(index).click(options);
     }
+    
     async enter(text: string) {
         await this.getElement().type(text);
     }

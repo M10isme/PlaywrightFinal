@@ -8,6 +8,10 @@ export const API_ENDPOINTS = {
     USER: {
         CURRENT: "/me",
         PROFILE: (username: string) => `/@${username}`,
-        LIKES: (username: string) => `/@${username}/likes`,
     }
+};
+
+export const COLLECTION_CONSTANTS = {
+    MY_FIRST_COLLECTION: "My first collection",
+    NUMBER_OF_PHOTOS_TO_ADD: 3
 };

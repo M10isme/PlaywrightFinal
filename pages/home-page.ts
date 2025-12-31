@@ -4,67 +4,45 @@ import { ProfilePage } from "./profile-page";
 export class HomePage {
     secondPicture: Element;
     avtIcon: Element;
+    profileIcon: Element;
     viewProfileButton: Element;
     logoutButton: Element;
-    avatarImage: Element;
-    photographerName: Element;
-    emailButton: Element;
-    moreActionsButton: Element;
-    introductionText: Element;
-    photosTab: Element;
-    likesTab: Element;
-    collectionsTab: Element;
-    profileIcon: Element;
+    randomPhoto: Element;
+    photoDialog: Element;
+    addToCollectionButton: Element;
+    collectionOption: Element;
+    closePhotoButton: Element;
 
     constructor() {
-        this.secondPicture = new Element("figure[data-masonryposition='2']");
+        this.secondPicture = new Element("figure[data-testid='asset-grid-masonry-figure']");
         this.avtIcon = new Element("div[data-testid='photos-route'] header img");
+        this.profileIcon = new Element("button img[alt*='Avatar of user']");
         this.viewProfileButton = new Element("View profile", LocatorType.TEXT, { exact: true });
         this.logoutButton = new Element("Logout", LocatorType.TEXT, { exact: false });
-        this.avatarImage = new Element("div[data-testid = 'users-route'] img[alt*='Avatar']");
-        this.photographerName = new Element("div[class*='FdAJI']");
-        this.emailButton = new Element("a[title *='Message']");
-        this.moreActionsButton = new Element("button[aria-label *='More Actions']");
-        this.introductionText = new Element("div.dM4Rz");
-        this.photosTab = new Element("a[data-testid='user-nav-link-photos']");
-        this.likesTab = new Element("a[data-testid='user-nav-link-likes']");
-        this.collectionsTab = new Element("a[data-testid='user-nav-link-collections']");
-        this.profileIcon = new Element("button img[alt*='Avatar of user']");
-
+        this.randomPhoto = new Element("figure[itemprop='image']");
+        this.photoDialog = new Element("div[role='dialog'][data-open]");
+        this.addToCollectionButton = new Element("figure[itemprop='image'] button[title='Add to collection']");
+        this.collectionOption = new Element("button[title*='collection']");
+        this.closePhotoButton = new Element("button[aria-label='Close']");
     }
 
     async goToPhotographerProfilePage(): Promise<HomePage> {
+        await this.avtIcon.waitForElementToBeVisible(5000);
         await this.avtIcon.hover();
+        await this.viewProfileButton.waitForElementToBeVisible(5000);
         await this.viewProfileButton.click();
         return new HomePage();
     }
 
     async clickSecondPicture() {
-        await this.secondPicture.clickWithIndex(0);
-        await this.avtIcon.waitForElementToBeVisible();
-    }
-
-    async isPhotographerProfileIsDisplayed(): Promise<boolean> {
-        const elements = [
-            this.avatarImage,
-            this.photographerName,
-            this.emailButton,
-            this.moreActionsButton,
-            this.introductionText,
-            this.photosTab,
-            this.likesTab,
-            this.collectionsTab
-        ];
-
-        const results = await Promise.allSettled(
-            elements.map(element => element.isVisible())
-        );
-
-        return results.every(result => result.status === 'fulfilled');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await this.secondPicture.clickWithIndex(1);
+        await this.avtIcon.waitForElementToBeVisible(10000);
     }
 
     async goToProfilePage(): Promise<ProfilePage> {
         await this.profileIcon.click();
+        await this.viewProfileButton.waitForElementToBeVisible(5000);
         await this.viewProfileButton.click();
         return new ProfilePage();
     }
@@ -73,5 +51,23 @@ export class HomePage {
         await this.profileIcon.click();
         await this.logoutButton.click();
         return new HomePage();
+    }
+
+    async addRandomPhotoToCollection(collectionName: string, photoIndex: number) {
+        const page = this.randomPhoto.getElement().page();
+        await page.keyboard.press('Escape');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const photoElement = this.randomPhoto.getElement().nth(photoIndex);
+        await photoElement.hover({ force: true });
+        await new Promise(resolve => setTimeout(resolve, 800));
+        const addButton = photoElement.locator("button[aria-label='Add to Collection']");
+        await addButton.click({ force: true, timeout: 10000 });
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const collectionButton = new Element(collectionName, LocatorType.TEXT, { exact: false });
+        await collectionButton.waitForElementToBeVisible(10000);
+        await collectionButton.click();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await page.keyboard.press('Escape');
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
 }
